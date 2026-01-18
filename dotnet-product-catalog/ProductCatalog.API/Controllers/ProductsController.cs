@@ -16,14 +16,14 @@ public class ProductsController(IProductService productService) : ControllerBase
         // LINQ for JOIN Operations
         var products = await productService.GetAllAsync();
         var response = ApiResponse<List<ProductDto>>.SuccessResult(products);
-        return Ok(products); // HTTP 200
+        return Ok(response); // HTTP 200
     }
 
     // 2. Add to new products ( POST: api/products )
     [HttpPost]
     public async Task<ActionResult<ApiResponse<ProductDto>>> Create(CreateProductDto request)
     {
-            var product = await productService.CreateAsync(request);
+        var product = await productService.CreateAsync(request);
 
         // Created (201) 
         var response = ApiResponse<ProductDto>.SuccessResult(product, 201, "The product has been created successfully.");
