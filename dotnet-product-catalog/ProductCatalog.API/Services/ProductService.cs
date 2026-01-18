@@ -1,3 +1,4 @@
+using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ProductCatalog.API.Data;
 using ProductCatalog.API.Dtos;
@@ -5,7 +6,7 @@ using ProductCatalog.API.Models;
 
 namespace ProductCatalog.API.Services;
 
-public class ProductService(AppDbContext context) : IProductService
+public class ProductService(AppDbContext context, IValidator<CreateProductDto> validator) : IProductService
 {
     public async Task<List<ProductDto>> GetAllAsync()
     {
@@ -22,6 +23,15 @@ public class ProductService(AppDbContext context) : IProductService
 
     public async Task<ProductDto> CreateAsync(CreateProductDto request)
     {
+        var validationResult = await validator.ValidateAsync(request);
+
+        if (!validationResult.IsValid)
+        {
+            var errors = string.Join(", ", validationResult.Errors.Select(e => e.ErrorMessage));
+            throw new Exception($"Validation Error: {errors}");
+        }
+
+        
         var category = await context.Categories.FindAsync(request.CategoryId);
         if (category == null)
         {
