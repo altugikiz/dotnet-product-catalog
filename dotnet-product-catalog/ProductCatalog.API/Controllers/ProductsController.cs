@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using ProductCatalog.API.Dtos;
 using ProductCatalog.API.Services;
 
@@ -22,14 +21,7 @@ public class ProductsController(IProductService productService) : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ProductDto>> Create(CreateProductDto request)
     {
-        try
-        {
             var result = await productService.CreateAsync(request);
             return StatusCode(201, result);
-        }
-        catch (Exception ex)
-        {
-            return BadRequest(ex.Message);
-        }
     }
 }
