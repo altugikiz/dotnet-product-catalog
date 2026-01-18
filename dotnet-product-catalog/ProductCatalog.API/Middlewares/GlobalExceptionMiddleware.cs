@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text.Json;
+using ProductCatalog.API.Exceptions;
 
 namespace ProductCatalog.API.Middlewares;
 
@@ -21,14 +22,20 @@ public class GlobalExceptionMiddleware(RequestDelegate next)
     {
         context.Response.ContentType = "application/json";
 
-        // Default Http 500
-        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+        var statusCode = exception switch
+        {
+            NotFoundException => (int)HttpStatusCode.NotFound,      // 404
+            BusinessException => (int)HttpStatusCode.BadRequest,    // 400
+            _ => (int)HttpStatusCode.InternalServerError            // 500
+        };
+
+        context.Response.StatusCode = statusCode;
 
         var response = new
         {
             StatusCode = context.Response.StatusCode,
             Message = exception.Message,
-            Detailed = "This bug was caught by Global Middleware!"
+            Detailed = statusCode == 500 ? "Internal Server Error" : "Operation failed."
         };
 
         var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
