@@ -1,6 +1,7 @@
 using System.Net;
 using System.Text.Json;
 using ProductCatalog.API.Exceptions;
+using ProductCatalog.API.Wrappers;
 
 namespace ProductCatalog.API.Middlewares;
 
@@ -31,12 +32,10 @@ public class GlobalExceptionMiddleware(RequestDelegate next)
 
         context.Response.StatusCode = statusCode;
 
-        var response = new
-        {
-            StatusCode = context.Response.StatusCode,
-            Message = exception.Message,
-            Detailed = statusCode == 500 ? "Internal Server Error" : "Operation failed."
-        };
+        string message = exception.Message;
+        if (statusCode == 500) message = "An unexpected server error occurred.";
+
+        var response = ApiResponse<object>.FailResult(message, statusCode);
 
         var jsonOptions = new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase };
         var jsonResponse = JsonSerializer.Serialize(response, jsonOptions);
