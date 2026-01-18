@@ -48,6 +48,9 @@ app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
+// Middleware Pipeline
+app.UseMiddleware<ProductCatalog.API.Middlewares.GlobalExceptionMiddleware>();
+
 // Redirect incoming requests to Controller classes
 app.MapControllers();
 
