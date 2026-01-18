@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using ProductCatalog.API.Data;
+using ProductCatalog.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +8,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Controller Structer
 builder.Services.AddControllers();
+
+// If someone asks you for IProductService, give them ProductService. (Scoped)
+builder.Services.AddScoped<IProductService, ProductService>();
 
 // Swagger / OpenAI Documents
 builder.Services.AddEndpointsApiExplorer();
