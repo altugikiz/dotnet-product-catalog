@@ -13,9 +13,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // To Add Context of Database
-// Temporary Database
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseInMemoryDatabase("ProductDb"));
+    options.UseNpgsql(connectionString));
 
 // -----------------------------------------------------------
 
