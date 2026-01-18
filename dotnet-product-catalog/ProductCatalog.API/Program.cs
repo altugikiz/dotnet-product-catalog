@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using ProductCatalog.API.Data;
 using ProductCatalog.API.Services;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Controller Structer
 builder.Services.AddControllers();
+
+builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
 // If someone asks you for IProductService, give them ProductService. (Scoped)
 builder.Services.AddScoped<IProductService, ProductService>();
