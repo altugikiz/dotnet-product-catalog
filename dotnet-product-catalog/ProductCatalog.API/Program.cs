@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using ProductCatalog.API.Data;
 using ProductCatalog.API.Services;
 using FluentValidation;
+using ProductCatalog.API.Mappings;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -11,6 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
+builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
 
 // If someone asks you for IProductService, give them ProductService. (Scoped)
 builder.Services.AddScoped<IProductService, ProductService>();

@@ -1,3 +1,4 @@
+using AutoMapper;
 using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 using ProductCatalog.API.Data;
@@ -6,19 +7,16 @@ using ProductCatalog.API.Models;
 
 namespace ProductCatalog.API.Services;
 
-public class ProductService(AppDbContext context, IValidator<CreateProductDto> validator) : IProductService
+public class ProductService(AppDbContext context, IValidator<CreateProductDto> validator, IMapper mapper) : IProductService
 {
     public async Task<List<ProductDto>> GetAllAsync()
     {
-        return await context.Products
+        var products = await context.Products
             .Include(p => p.Category)
-            .Select(p => new ProductDto(
-                p.Id,
-                p.Name,
-                p.Price,
-                p.Category != null ? p.Category.Name : "No"
-            ))
             .ToListAsync();
+
+        // (products) -> DTO list
+        return mapper.Map<List<ProductDto>>(products);
     }
 
     public async Task<ProductDto> CreateAsync(CreateProductDto request)
@@ -31,28 +29,18 @@ public class ProductService(AppDbContext context, IValidator<CreateProductDto> v
             throw new Exception($"Validation Error: {errors}");
         }
 
-        
+
         var category = await context.Categories.FindAsync(request.CategoryId);
         if (category == null)
         {
             throw new Exception("Category not found!");
         }
 
-        var product = new Product
-        {
-            Name = request.Name,
-            Price = request.Price,
-            CategoryId = request.CategoryId
-        };
+        var product = mapper.Map<Product>(request);
 
         context.Products.Add(product);
         await context.SaveChangesAsync();
 
-        return new ProductDto(
-            product.Id,
-            product.Name,
-            product.Price,
-            category.Name
-        );
+        return mapper.Map<ProductDto>(product);
     }
 }
