@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using ProductCatalag.API.Models;
 using ProductCatalog.API.Models;
 
 namespace ProductCatalog.API.Data;
@@ -11,6 +12,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Product> Products { get; set; }
     public DbSet<Category> Categories { get; set; }
+    public DbSet<User> Users { get; set; }
 
     // Initial Data (Seed)
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -27,5 +29,7 @@ public class AppDbContext : DbContext
             new Product { Id = 2, Name = "iPhone 15", Price = 60000, CategoryId = 1 },
             new Product { Id = 3, Name = "Hoodie", Price = 1500, CategoryId = 2 }
         );
+
+        base.OnModelCreating(modelBuilder);
     }
 }
