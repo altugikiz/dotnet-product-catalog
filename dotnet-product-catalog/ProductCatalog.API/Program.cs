@@ -1,3 +1,6 @@
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using Microsoft.EntityFrameworkCore;
 using ProductCatalog.API.Data;
 using ProductCatalog.API.Services;
@@ -13,6 +16,30 @@ builder.Services.AddControllers();
 
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 builder.Services.AddAutoMapper(typeof(MappingProfile).Assembly);
+
+// JWT Settings
+// Read Secret Key from AppSettings
+var secretKey = builder.Configuration.GetValue<string>("JwtSettings:SecretKey");
+var key = Encoding.ASCII.GetBytes(secretKey!);
+
+// 2. Authentication Service
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false; // False for development
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false, 
+        ValidateAudience = false
+    };
+});
 
 // If someone asks you for IProductService, give them ProductService. (Scoped)
 builder.Services.AddScoped<IProductService, ProductService>();
